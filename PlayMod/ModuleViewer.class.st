@@ -12,11 +12,15 @@ Class {
 }
 
 { #category : #specs }
-ModuleViewer class >> defaultSpec^ [ 
-SpecColumnLayout composed
- 	newRow: [ :row| row add: #modules; add: #imports; add: #classes; add: #undefined];
-	newRow: [ :row| row add: #text ]
-yourself
+ModuleViewer class >> defaultSpec [
+	^ SpecColumnLayout composed
+		newRow: [ :row | 
+			row
+				add: #modules;
+				add: #imports;
+				add: #classes;
+				add: #undefined ];
+		newRow: [ :row | row add: #text ] yourself
 ]
 
 { #category : #accessing }

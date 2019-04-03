@@ -10,8 +10,10 @@ Class {
 }
 
 { #category : #specs }
-ImportViewer class >> defaultSpec^ [ 
-SpecColumnLayout composed add: #imports;" add: #fromModules; add: #importClasses;"yourself
+ImportViewer class >> defaultSpec [
+	^ SpecColumnLayout composed
+		add: #imports;
+			yourself
 ]
 
 { #category : #'as yet unclassified' }
