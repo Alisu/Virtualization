@@ -16,18 +16,21 @@ ManagingVirtualizationLayerTest >> setUp [
 { #category : #'as yet unclassified' }
 ManagingVirtualizationLayerTest >> testClassAreSaveInPackage [
 
+self flag: #TODO. "Make a real assert test"
 virtualizer saveClassesFromVirtualizationLayer.
 ]
 
 { #category : #'as yet unclassified' }
 ManagingVirtualizationLayerTest >> testImportsAreSaveInPackage [
 
+self flag: #TODO. "Make a real assert test"
 virtualizer saveImportsFromVirtualizationLayer.
 ]
 
 { #category : #'as yet unclassified' }
 ManagingVirtualizationLayerTest >> testSaveLayerInPackage [
 
+self flag: #TODO. "Make a real assert test"
 	virtualizer saveVirtualizationLayer
 ]
 
@@ -66,5 +69,6 @@ ManagingVirtualizationLayerTest >> testloadLayer [
 	self assert: virtualizer virtualizationLayer isNil.
 	virtualizer loadVirtualizationLayer.
 	self assert: virtualizer virtualizationLayer environment isNotEmpty.
-	self assert: virtualizer virtualizationLayer imports isNotEmpty
+	self assert: virtualizer virtualizationLayer imports isNotEmpty.
+
 ]

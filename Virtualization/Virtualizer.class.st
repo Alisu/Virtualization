@@ -42,100 +42,60 @@ Virtualizer >> declareUndeclaredNamesAsImports [
 			virtualizedModule declareImport: anUName ] ].
 ]
 
-{ #category : #virtuali }
+{ #category : #'load and saving' }
 Virtualizer >> loadClassesForVirtualizationLayer [
 
-	| definitions |
-	definitions := self retrieveClassesForVirtualizationLayer.
 	"Checking virtualization layer exist"
 	virtualizationLayer isNil
 		ifTrue: [ virtualizationLayer := MLModule
 				newNamed: virtualizedModule name , 'VirtualizationLayer' ].
-	"Doing 2 passes, 1st is for classes"
-	definitions
-		do: [ :aDefinition | 
-			(aDefinition isClassDefinition
-				and: [ (virtualizationLayer definesClassNamed: aDefinition className) not ])
-				ifTrue: [ virtualizationLayer declareClass: aDefinition asRBClassDefinition ] ].
-	"2nd passes is for method"
-	definitions
-		do: [ :aDefinition | 
-			aDefinition isMethodDefinition
-				ifTrue: [ virtualizationLayer
-						compileMethod: aDefinition source
-						inClass:
-							(virtualizationLayer
-								classNamed: aDefinition className
-								ifAbsent: [ virtualizationLayer declareClassNamed: aDefinition className ]) ] ].
+ 
+ModuleLoader loadClassesFor: virtualizationLayer.
 ]
 
-{ #category : #virtuali }
+{ #category : #'load and saving' }
 Virtualizer >> loadImportsForVirtualizationLayer [
 
 	"Checking virtualization layer exist"
 	virtualizationLayer isNil
 		ifTrue: [ virtualizationLayer := MLModule
 				newNamed: virtualizedModule name , 'VirtualizationLayer' ].
-self retrieveImportsForVirtualizationLayer do: [:import| virtualizationLayer declareImport: import importedName from: import moduleName as: import aliasName  ]
+	ModuleLoader loadImportsFor: virtualizationLayer.
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'load and saving' }
 Virtualizer >> loadVirtualizationLayer [
 
 	self loadClassesForVirtualizationLayer.
 	self loadImportsForVirtualizationLayer.
 ]
 
-{ #category : #virtuali }
+{ #category : #'load and saving' }
 Virtualizer >> retrieveClassesForVirtualizationLayer [
-	"i think we should at least save the imports too"
-	|path|
-	path := FileSystem workingDirectory / self virtualizationLayerName.
-	^(TonelReader on: path fileName: 'Classes') loadDefinitions definitions.
+
+^ModuleLoader retrieveClassesFor: virtualizationLayer.
 
 ]
 
-{ #category : #virtuali }
+{ #category : #'load and saving' }
 Virtualizer >> retrieveImportsForVirtualizationLayer [
 
-|path importsToAdd|
-
-importsToAdd := Set new.
-path:=(FileSystem workingDirectory / virtualizationLayer name / 'Imports').
-path createDirectory.
-	FileSystem disk filesAt: path do:  [:file| file asFileReference readStreamDo: [ :s |
-	importsToAdd add: (STON fromStream: s) ]].
-^importsToAdd
+^ModuleLoader retrieveImportsFor: virtualizationLayer.
 ]
 
-{ #category : #virtuali }
+{ #category : #'load and saving' }
 Virtualizer >> saveClassesFromVirtualizationLayer [
-	"i think we should at least save the imports too"
 
-	| path aFileRef |
-	path := FileSystem workingDirectory / virtualizationLayer name
-		/ 'Classes'.
-	path createDirectory.
-	virtualizationLayer environment
-		valuesDo: [ :aClass | 
-			aFileRef := path / aClass name , 'st'.
-			TonelWriter
-				exportClass: aClass
-				on: (File named: aFileRef fullName) writeStream ]
+	ModuleSaver saveClassesFrom: virtualizationLayer.
 ]
 
-{ #category : #virtuali }
+{ #category : #'load and saving' }
 Virtualizer >> saveImportsFromVirtualizationLayer [
-	"i think we should at least save the imports too"
-|path|
-path:=(FileSystem workingDirectory / virtualizationLayer name / 'Imports').
-path createDirectory.
-	virtualizationLayer imports
-		do: [:import| (path / import aliasName) writeStreamDo: [ :s |
-	STON put: import onStreamPretty: s ]]
+
+ModuleSaver saveImportsFrom: virtualizationLayer.
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'load and saving' }
 Virtualizer >> saveVirtualizationLayer [
 	| path |
 	path := FileSystem workingDirectory / virtualizationLayer name.
