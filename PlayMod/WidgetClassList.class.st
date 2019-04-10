@@ -46,8 +46,13 @@ label label: aText
 ]
 
 { #category : #accessing }
-WidgetClassList >> resetSelection [ 
-classes resetSelection
+WidgetClassList >> resetSelection [
+	classes unselectAll
+]
+
+{ #category : #accessing }
+WidgetClassList >> selectedItem [
+	^ classes selection selectedItem
 ]
 
 { #category : #initialization }
@@ -57,5 +62,6 @@ WidgetClassList >> title [
 
 { #category : #accessing }
 WidgetClassList >> whenSelectedItemChanged: aBlock [
-classes whenSelectedItemChanged: aBlock
+	classes
+		whenSelectionChangedDo: [ :selection | aBlock cull: selection selectedItem ]
 ]

@@ -43,18 +43,19 @@ ClassMethodModuleBrowser >> classes: aList [
 
 { #category : #accessing }
 ClassMethodModuleBrowser >> initializePresenter [
-	
 	| classSelected |
-	listModel whenSelectedItemChanged: [:selection |
-		selection 
-			ifNotNil: [:class | 
-				classSelected:=self listModel selectedItem.
-				methodModel methods: (class methods sort: [:a :b | a selector < b selector]).
-				methodModel listModel resetSelection ]].
-
-	methodModel acceptBlock: [:t | classSelected environment compileMethod: t inClass: classSelected.
-		methodModel listModel resetSelection.
-		].
+	listModel
+		whenSelectedItemChangedDo: [ :selection | 
+			selection
+				ifNotNil: [ :class | 
+					classSelected := self listModel selectedItem.
+					methodModel
+						methods: (class methods sort: [ :a :b | a selector < b selector ]).
+					methodModel listModel resetSelection ] ].
+	methodModel
+		acceptBlock: [ :t | 
+			classSelected environment compileMethod: t inClass: classSelected.
+			methodModel listModel resetSelection ]
 ]
 
 { #category : #accessing }

@@ -7,7 +7,9 @@ Class {
 		'classes',
 		'undefined',
 		'text',
-		'moduleList'
+		'moduleList',
+		'moduleRegistry',
+		'menu'
 	],
 	#category : #'PlayMod-Modules-Imports-Classes'
 }
@@ -15,6 +17,7 @@ Class {
 { #category : #specs }
 ModuleViewer class >> defaultSpec [
 	^ SpecColumnLayout composed
+		newRow: [ :row | row add: #menu ] height: self toolbarHeight;
 		newRow: [ :row | 
 			row
 				add: #modules;
@@ -34,9 +37,49 @@ ModuleViewer class >> example [
 	aCollection add: (MLModule newNamed: 'Pouet2').
 
 	example
-		moduleList: aCollection;
+		moduleList: MLModuleRegistry global moduleEnvironment values;
 		openWithSpec.
 		^example
+]
+
+{ #category : #actions }
+ModuleViewer >> acceptDefinition: aText [
+	
+	| classDefinition |
+	classDefinition := CDClassDefinitionParser parse: aText asString.
+	self selectedModule declareClass: classDefinition.
+	
+	self refreshClasses.
+]
+
+{ #category : #initialization }
+ModuleViewer >> buildMenu [
+
+	^ self newMenuBar addGroup: [ :group | 
+			group addItem: [ :item | 
+				item
+					name: 'File';
+					subMenu: (self newMenu
+						addItem: [ :subitem | 
+							subitem
+								name: 'New...';
+								action: [ self createModule ] ];
+						addItem: [ :subitem | 
+							subitem
+								name: 'Import...';
+								action: [ self importModule ] ]) ] ].
+]
+
+{ #category : #initialization }
+ModuleViewer >> classDefinitionTab [
+	
+	^ NotebookPage
+		title: 'Class definition'
+		provider: [ 
+			self newText
+				text: (self selectedClass ifNotNil: #definitionNew);
+				acceptBlock: [ :someText | self acceptDefinition: someText ];
+				yourself ]
 ]
 
 { #category : #accessing }
@@ -47,6 +90,35 @@ ModuleViewer >> classes [
 { #category : #'as yet unclassified' }
 ModuleViewer >> classesIn: module [
 ^ (module classes).
+]
+
+{ #category : #actions }
+ModuleViewer >> createModule [
+	
+	| name |
+	name := UIManager default request: 'New Module Name' initialAnswer: 'MyModule'.
+	
+	moduleRegistry registerModule: (MLModule newNamed: name).
+	self refreshModuleList.
+]
+
+{ #category : #actions }
+ModuleViewer >> importModule [
+	
+	| selectedPackage collection selectedPackageIndex newModule |
+	collection := (RPackageOrganizer default packages collect: #name) sort.
+	
+	selectedPackageIndex := (UIManager default
+		chooseFrom: collection
+		lines: #()
+		title: 'Choose a package to import').
+	
+	selectedPackage := (collection at: selectedPackageIndex) asPackage.	
+	
+	newModule := MLModule loadRPackage: selectedPackage.
+	moduleRegistry registerModule: newModule.
+
+	self refreshModuleList.
 ]
 
 { #category : #accessing }
@@ -61,43 +133,57 @@ ModuleViewer >> importsIn: module [
 
 { #category : #initialization }
 ModuleViewer >> initializePresenter [
-|lastModuleSelected|
-
-modules whenSelectedItemChanged: [ :module|
-	imports resetSelection.
-	classes resetSelection.
-	module
-	ifNil: [ imports items: #().
-				classes items: #().
-				undefined items: #().
-				text text: ''.
-				text behavior: nil. ]
-	ifNotNil: [	lastModuleSelected := module.
-					imports imports: (self importsIn: module).
-					classes items: (self classesIn: module).
-					undefined items: (self undefinedIn: module).
-					text text: module printDeclaration.
-					 ] ].
-
-imports whenImportChanged: [ :import |
-	import ifNotNil: [ imports resetSelection ] ].
-classes whenSelectedItemChanged: [ :class |
-	class ifNotNil: [ classes resetSelection.
-							text text: '', lastModuleSelected printString, ' declareClassNamed: ', class name ] ]
+	self modules displayBlock: [ :aModule | aModule name ].
+	self refreshModuleList.
+	self refreshTabs.
+	
+	modules
+		whenSelectionChangedDo: [ :selection | [ :module | self selectModule: module ] cull: selection selectedItem ].
+	imports
+		whenImportChanged: [ :import | import ifNotNil: [ imports resetSelection ] ].
+	classes whenSelectedItemChanged: [ :class | 
+		class ifNotNil: [ 
+			classes resetSelection.
+			self refreshTabs ] ]
 ]
 
 { #category : #initialization }
 ModuleViewer >> initializeWidgets [
-modules := self instantiate: WidgetModuleList.
-imports := self instantiate: ImportViewer.
-classes := self instantiate: WidgetClassList.
-undefined := self instantiate: WidgetClassList. 
-text := self instantiate: self newCode.
-classes label: 'Class'.
-undefined label:'Undefined'.
-self focusOrder add: modules; add: imports; add: classes; add: undefined; add: text.
-text aboutToStyle: true.
-"text beForCode."
+
+	menu := self buildMenu.
+	
+	modules := self newList.
+	imports := self instantiate: ImportViewer.
+	classes := self instantiate: WidgetClassList.
+	undefined := self instantiate: WidgetClassList.
+	
+	text := self newNotebook.
+	text
+		addPage: self moduleDefinitionTab;
+		addPage: self classDefinitionTab.
+
+	classes label: 'Class'.
+	undefined label: 'Undefined'.
+	
+	self focusOrder
+		add: modules;
+		add: imports;
+		add: classes;
+		add: undefined;
+		add: text.
+"	text aboutToStyle: true"
+	"text beForCode."
+]
+
+{ #category : #initialization }
+ModuleViewer >> moduleDefinitionTab [
+	
+	^ NotebookPage
+		title: 'Module definition'
+		provider: [ 
+			self newText
+				text: (self selectedModule ifNotNil: #printDeclaration);
+				yourself ]
 ]
 
 { #category : #accessing }
@@ -113,6 +199,61 @@ ModuleViewer >> moduleList: aList [
 { #category : #accessing }
 ModuleViewer >> modules [
 	^ modules
+]
+
+{ #category : #initialization }
+ModuleViewer >> refreshClasses [
+
+	classes items: (self classesIn: self selectedModule)
+]
+
+{ #category : #initialization }
+ModuleViewer >> refreshModuleList [
+	
+	self modules
+		items: (moduleRegistry moduleEnvironment values sorted: [:a :b | a name < b name ])
+]
+
+{ #category : #refreshing }
+ModuleViewer >> refreshTabs [
+	
+	text resetAllPageContents
+]
+
+{ #category : #initialization }
+ModuleViewer >> selectModule: aModule [
+
+	imports resetSelection.
+	classes resetSelection.
+	
+	aModule ifNil: [
+		imports items: #().
+		classes items: #().
+		undefined items: #().
+		text text: ''.
+		text behavior: nil. ]
+			ifNotNil: [
+		imports imports: (self importsIn: aModule).
+		classes items: (self classesIn: aModule).
+		undefined items: (self undefinedIn: aModule).
+		self refreshTabs ]
+]
+
+{ #category : #initialization }
+ModuleViewer >> selectedClass [
+
+	^ classes selectedItem
+]
+
+{ #category : #initialization }
+ModuleViewer >> selectedModule [
+	^ self modules selection selectedItem
+]
+
+{ #category : #accessing }
+ModuleViewer >> setModelBeforeInitialization: aModuleRegistry [
+
+	moduleRegistry := aModuleRegistry
 ]
 
 { #category : #accessing }

@@ -46,8 +46,8 @@ label label: aText
 ]
 
 { #category : #accessing }
-WidgetImportList >> resetSelection [ 
-imports resetSelection
+WidgetImportList >> resetSelection [
+	imports unselectAll
 ]
 
 { #category : #initialization }
@@ -57,5 +57,6 @@ WidgetImportList >> title [
 
 { #category : #accessing }
 WidgetImportList >> whenSelectedItemChanged: aBlock [
-imports whenSelectedItemChanged: aBlock
+	imports
+		whenSelectionChangedDo: [ :selection | aBlock cull: selection selectedItem ]
 ]
