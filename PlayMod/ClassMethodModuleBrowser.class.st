@@ -13,8 +13,8 @@ ClassMethodModuleBrowser class >> defaultSpec [
 <spec>
 	^ SpecLayout composed
 		newRow: [:row | row
-						add: #listModel;
-						add: #methodModel ];
+			add: #listModel width: 300;
+			add: #methodModel ];
 		yourself
 ]
 
@@ -36,6 +36,17 @@ ClassMethodModuleBrowser class >> title [
 ]
 
 { #category : #accessing }
+ClassMethodModuleBrowser >> acceptMethodText: aText [
+
+	self selectedClass environment
+		compileMethod: aText
+		inClass: self selectedClass.
+	
+	self refreshMethods.
+	methodModel listModel unselectAll
+]
+
+{ #category : #accessing }
 ClassMethodModuleBrowser >> classes [
 	
 	^ listModel items
@@ -49,21 +60,14 @@ ClassMethodModuleBrowser >> classes: aList [
 
 { #category : #accessing }
 ClassMethodModuleBrowser >> initializePresenter [
-	| classSelected |
+
 	listModel
 		whenSelectionChangedDo: [ :selection | 
-			[ :selection | 
-			selection
-				ifNotNil: [ :class | 
-					classSelected := self listModel selection selectedItem.
-					methodModel
-						methods: (class methods sort: [ :a :b | a selector < b selector ]).
-					methodModel listModel unselectAll ] ]
-				cull: selection selectedItem ].
-	methodModel
-		acceptBlock: [ :t | 
-			classSelected environment compileMethod: t inClass: classSelected.
-			methodModel listModel resetSelection ]
+			selection selectedItem
+				ifNotNil: [ :class |
+					self refreshMethods.
+					methodModel listModel unselectAll ] ].
+	methodModel acceptBlock: [ :t | self acceptMethodText: t ]
 ]
 
 { #category : #accessing }
@@ -94,10 +98,22 @@ ClassMethodModuleBrowser >> methods [
 	^ methodModel methods
 ]
 
+{ #category : #accessing }
+ClassMethodModuleBrowser >> refreshMethods [
+
+	methodModel
+		methods: (self selectedClass methods sort: [ :a :b | a selector < b selector ]).
+]
+
 { #category : #selection }
 ClassMethodModuleBrowser >> selectClass: aClass [ 
 	
 	listModel selectItem: aClass
+]
+
+{ #category : #accessing }
+ClassMethodModuleBrowser >> selectedClass [
+	^ listModel selection selectedItem
 ]
 
 { #category : #selection }

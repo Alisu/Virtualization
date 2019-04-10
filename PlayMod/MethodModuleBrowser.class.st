@@ -70,17 +70,15 @@ MethodModuleBrowser >> displayBlock: aBlock [
 MethodModuleBrowser >> initializePresenter [
 	listModel
 		whenSelectionChangedDo: [ :selection | 
-			[ :selection | 
-			selection
+			selection selectedItem
 				ifNil: [ textModel text: ''.
 					textModel behavior: nil.
 					toolbarModel method: nil ]
 				ifNotNil: [ :m | 
 					textModel text: m sourceCode.
 					textModel behavior: m methodClass.
-					toolbarModel method: m ] ] cull: selection selectedItem ].
+					toolbarModel method: m ]].
 
-	"self acceptBlock: [:t | self listModel selectedItem inspect]."
 	self
 		wrapWith: [ :item | item methodClass name , '>>#' , item selector ]
 ]

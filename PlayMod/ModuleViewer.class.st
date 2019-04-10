@@ -21,7 +21,7 @@ ModuleViewer class >> defaultSpec [
 		newRow: [ :row | row add: #menu ] height: self toolbarHeight;
 		newRow: [ :row | 
 			row
-				add: #modules width: 100;
+				add: #modules width: 200;
 				add: #moduleContentsNotebook ];
 		newRow: [ :row | row add: #definitionsNotebook ];
 		yourself
@@ -203,6 +203,12 @@ ModuleViewer >> initializeWidgets [
 		add: definitionsNotebook.
 "	text aboutToStyle: true"
 	"text beForCode."
+]
+
+{ #category : #actions }
+ModuleViewer >> initializeWindow: aWindow [
+
+	aWindow initialExtent: 1000@800
 ]
 
 { #category : #initialization }
