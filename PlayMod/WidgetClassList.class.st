@@ -31,6 +31,12 @@ self focusOrder add: classes.
 ]
 
 { #category : #accessing }
+WidgetClassList >> items [
+
+	^ classes items
+]
+
+{ #category : #accessing }
 WidgetClassList >> items: aCollection [
 classes items: aCollection
 ]

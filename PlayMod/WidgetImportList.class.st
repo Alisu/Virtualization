@@ -31,8 +31,13 @@ self focusOrder add: imports.
 ]
 
 { #category : #accessing }
+WidgetImportList >> items [
+	^ imports items
+]
+
+{ #category : #accessing }
 WidgetImportList >> items: aCollection [
-imports items: aCollection
+	imports items: aCollection
 ]
 
 { #category : #accessing }

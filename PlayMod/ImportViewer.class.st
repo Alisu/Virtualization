@@ -44,7 +44,7 @@ ImportViewer >> imports [
 
 { #category : #accessing }
 ImportViewer >> imports: aCollection [
-imports items: aCollection
+	imports items: aCollection
 ]
 
 { #category : #'as yet unclassified' }
@@ -77,6 +77,12 @@ importClasses  := self instantiate: WidgetImportList.
 fromModules  label: 'From'.
 importClasses  label: 'Class'.
 self focusOrder add: imports; add: fromModules ; add: importClasses .
+]
+
+{ #category : #accessing }
+ImportViewer >> items [
+	
+	^ imports items
 ]
 
 { #category : #accessing }

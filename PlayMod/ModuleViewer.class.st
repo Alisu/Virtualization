@@ -82,6 +82,12 @@ ModuleViewer >> classDefinitionTab [
 				yourself ]
 ]
 
+{ #category : #components }
+ModuleViewer >> classList [
+	
+	^ classes
+]
+
 { #category : #accessing }
 ModuleViewer >> classes [
 	^ classes
@@ -100,6 +106,12 @@ ModuleViewer >> createModule [
 	
 	moduleRegistry registerModule: (MLModule newNamed: name).
 	self refreshModuleList.
+]
+
+{ #category : #components }
+ModuleViewer >> importList [
+	
+	^ imports
 ]
 
 { #category : #actions }
@@ -264,6 +276,12 @@ ModuleViewer >> text [
 { #category : #initialization }
 ModuleViewer >> title [
 ^ 'Module viewer'
+]
+
+{ #category : #components }
+ModuleViewer >> undeclaredList [
+	
+	^ undefined
 ]
 
 { #category : #accessing }
