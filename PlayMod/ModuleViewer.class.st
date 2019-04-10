@@ -6,10 +6,11 @@ Class {
 		'imports',
 		'classes',
 		'undefined',
-		'text',
 		'moduleList',
 		'moduleRegistry',
-		'menu'
+		'menu',
+		'definitionsNotebook',
+		'moduleContentsNotebook'
 	],
 	#category : #'PlayMod-Modules-Imports-Classes'
 }
@@ -21,9 +22,7 @@ ModuleViewer class >> defaultSpec [
 		newRow: [ :row | 
 			row
 				add: #modules;
-				add: #imports;
-				add: #classes;
-				add: #undefined ];
+				add: #moduleContentsNotebook ];
 		newRow: [ :row | row add: #text ] yourself
 ]
 
@@ -88,6 +87,14 @@ ModuleViewer >> classList [
 	^ classes
 ]
 
+{ #category : #initialization }
+ModuleViewer >> classListTab [
+	
+	^ NotebookPage
+		title: 'Classes'
+		provider: (classes := self instantiate: WidgetClassList)
+]
+
 { #category : #accessing }
 ModuleViewer >> classes [
 	^ classes
@@ -112,6 +119,14 @@ ModuleViewer >> createModule [
 ModuleViewer >> importList [
 	
 	^ imports
+]
+
+{ #category : #initialization }
+ModuleViewer >> importListTab [
+	
+	^ NotebookPage
+		title: 'Imports'
+		provider: (imports := self instantiate: ImportViewer)
 ]
 
 { #category : #actions }
@@ -151,7 +166,7 @@ ModuleViewer >> initializePresenter [
 	
 	modules
 		whenSelectionChangedDo: [ :selection | [ :module | self selectModule: module ] cull: selection selectedItem ].
-	imports
+	imports 
 		whenImportChanged: [ :import | import ifNotNil: [ imports resetSelection ] ].
 	classes whenSelectedItemChanged: [ :class | 
 		class ifNotNil: [ 
@@ -163,26 +178,25 @@ ModuleViewer >> initializePresenter [
 ModuleViewer >> initializeWidgets [
 
 	menu := self buildMenu.
-	
 	modules := self newList.
-	imports := self instantiate: ImportViewer.
-	classes := self instantiate: WidgetClassList.
-	undefined := self instantiate: WidgetClassList.
 	
-	text := self newNotebook.
-	text
+	moduleContentsNotebook := self newNotebook.
+	moduleContentsNotebook
+		addPage: self classListTab;
+		addPage: self importListTab;
+		addPage: self undeclaredListTab.
+	
+	definitionsNotebook := self newNotebook.
+	definitionsNotebook
 		addPage: self moduleDefinitionTab;
 		addPage: self classDefinitionTab.
-
-	classes label: 'Class'.
-	undefined label: 'Undefined'.
 	
 	self focusOrder
 		add: modules;
 		add: imports;
 		add: classes;
 		add: undefined;
-		add: text.
+		add: definitionsNotebook.
 "	text aboutToStyle: true"
 	"text beForCode."
 ]
@@ -229,7 +243,7 @@ ModuleViewer >> refreshModuleList [
 { #category : #refreshing }
 ModuleViewer >> refreshTabs [
 	
-	text resetAllPageContents
+	definitionsNotebook resetAllPageContents
 ]
 
 { #category : #initialization }
@@ -242,8 +256,8 @@ ModuleViewer >> selectModule: aModule [
 		imports items: #().
 		classes items: #().
 		undefined items: #().
-		text text: ''.
-		text behavior: nil. ]
+		definitionsNotebook text: ''.
+		definitionsNotebook behavior: nil. ]
 			ifNotNil: [
 		imports imports: (self importsIn: aModule).
 		classes items: (self classesIn: aModule).
@@ -270,7 +284,7 @@ ModuleViewer >> setModelBeforeInitialization: aModuleRegistry [
 
 { #category : #accessing }
 ModuleViewer >> text [
-	^ text
+	^ definitionsNotebook
 ]
 
 { #category : #initialization }
@@ -282,6 +296,14 @@ ModuleViewer >> title [
 ModuleViewer >> undeclaredList [
 	
 	^ undefined
+]
+
+{ #category : #initialization }
+ModuleViewer >> undeclaredListTab [
+	
+	^ NotebookPage
+		title: 'Undeclareds'
+		provider: (undefined := self instantiate: WidgetClassList)
 ]
 
 { #category : #accessing }
