@@ -4,7 +4,8 @@ Class {
 	#instVars : [
 		'registry',
 		'module',
-		'browser'
+		'browser',
+		'class'
 	],
 	#category : #'PlayMod-Tests'
 }
@@ -15,8 +16,10 @@ ModuleBrowserTest >> setUp [
 	registry := MLModuleRegistry new.
 	module := MLModule newNamed: 'fortest'.
 	module declareImport: 'ImportedName'.
-	module declareClassNamed: 'MyClass'.
 	module declareUndeclaredBinding: 'anUndeclaredName'.
+
+	class := module declareClassNamed: 'MyClass'.
+	module compileMethod: 'method ^42' inClass: class.
 	
 	registry registerModule: module.
 	
@@ -25,12 +28,23 @@ ModuleBrowserTest >> setUp [
 ]
 
 { #category : #tests }
+ModuleBrowserTest >> testSelectClassShowsMethods [
+
+	browser selectModule: module.
+	browser selectClass: class.
+	
+	self
+		assert: browser shownMethods asSet
+		equals: class methods asSet
+]
+
+{ #category : #tests }
 ModuleBrowserTest >> testSelectModuleUpdatesClasses [
 
 	browser selectModule: module.
 	
 	self
-		assert: browser classList items asSet
+		assert: browser shownClasses asSet
 		equals: module classes asSet
 ]
 

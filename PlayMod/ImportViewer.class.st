@@ -95,6 +95,12 @@ ImportViewer >> title [
 ^ 'Module viewer'
 ]
 
+{ #category : #selection }
+ImportViewer >> unselectAll [
+	
+	importClasses unselectAll
+]
+
 { #category : #'as yet unclassified' }
 ImportViewer >> whenFromModuleChanged: aBlock [
 fromModules whenSelectedItemChanged: aBlock

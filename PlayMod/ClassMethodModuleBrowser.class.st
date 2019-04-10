@@ -36,6 +36,12 @@ ClassMethodModuleBrowser class >> title [
 ]
 
 { #category : #accessing }
+ClassMethodModuleBrowser >> classes [
+	
+	^ listModel items
+]
+
+{ #category : #accessing }
 ClassMethodModuleBrowser >> classes: aList [
 
 	self listModel items: aList
@@ -45,13 +51,15 @@ ClassMethodModuleBrowser >> classes: aList [
 ClassMethodModuleBrowser >> initializePresenter [
 	| classSelected |
 	listModel
-		whenSelectedItemChangedDo: [ :selection | 
+		whenSelectionChangedDo: [ :selection | 
+			[ :selection | 
 			selection
 				ifNotNil: [ :class | 
-					classSelected := self listModel selectedItem.
+					classSelected := self listModel selection selectedItem.
 					methodModel
 						methods: (class methods sort: [ :a :b | a selector < b selector ]).
-					methodModel listModel resetSelection ] ].
+					methodModel listModel unselectAll ] ]
+				cull: selection selectedItem ].
 	methodModel
 		acceptBlock: [ :t | 
 			classSelected environment compileMethod: t inClass: classSelected.
@@ -78,4 +86,28 @@ ClassMethodModuleBrowser >> listModel [
 ClassMethodModuleBrowser >> methodModel [
 
 	^ methodModel
+]
+
+{ #category : #accessing }
+ClassMethodModuleBrowser >> methods [
+	
+	^ methodModel methods
+]
+
+{ #category : #selection }
+ClassMethodModuleBrowser >> selectClass: aClass [ 
+	
+	listModel selectItem: aClass
+]
+
+{ #category : #selection }
+ClassMethodModuleBrowser >> unselectAll [
+	
+	listModel unselectAll
+]
+
+{ #category : #events }
+ClassMethodModuleBrowser >> whenSelectedClassChangedDo: aBlockClosure [ 
+	
+	listModel whenSelectionChangedDo: aBlockClosure
 ]

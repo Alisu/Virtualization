@@ -69,7 +69,8 @@ MethodModuleBrowser >> displayBlock: aBlock [
 { #category : #initialization }
 MethodModuleBrowser >> initializePresenter [
 	listModel
-		whenSelectedItemChangedDo: [ :selection | 
+		whenSelectionChangedDo: [ :selection | 
+			[ :selection | 
 			selection
 				ifNil: [ textModel text: ''.
 					textModel behavior: nil.
@@ -77,7 +78,7 @@ MethodModuleBrowser >> initializePresenter [
 				ifNotNil: [ :m | 
 					textModel text: m sourceCode.
 					textModel behavior: m methodClass.
-					toolbarModel method: m ] ].
+					toolbarModel method: m ] ] cull: selection selectedItem ].
 
 	"self acceptBlock: [:t | self listModel selectedItem inspect]."
 	self
@@ -94,13 +95,19 @@ MethodModuleBrowser >> initializeWidgets [
 		add: toolbarModel;
 		add: textModel.
 	textModel aboutToStyle: true.
-	textModel beForCode.
+	"textModel beForCode."
 ]
 
 { #category : #accessing }
 MethodModuleBrowser >> listModel [
 
 	^ listModel
+]
+
+{ #category : #accessing }
+MethodModuleBrowser >> methods [
+
+	^ self listModel items
 ]
 
 { #category : #api }

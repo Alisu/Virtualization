@@ -60,6 +60,12 @@ WidgetImportList >> title [
 ^ 'Imports widget'
 ]
 
+{ #category : #selection }
+WidgetImportList >> unselectAll [
+	
+	imports unselectAll
+]
+
 { #category : #accessing }
 WidgetImportList >> whenSelectedItemChanged: aBlock [
 	imports
