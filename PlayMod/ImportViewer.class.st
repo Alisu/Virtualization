@@ -6,7 +6,7 @@ Class {
 		'importClasses',
 		'fromModules'
 	],
-	#category : #PlayMod
+	#category : #'PlayMod-Modules-Imports-Classes'
 }
 
 { #category : #specs }
@@ -14,6 +14,12 @@ ImportViewer class >> defaultSpec [
 	^ SpecColumnLayout composed
 		add: #imports;
 			yourself
+]
+
+{ #category : #specs }
+ImportViewer class >> example [
+	<sampleInstance>
+	^ self new openWithSpec
 ]
 
 { #category : #'as yet unclassified' }

@@ -4,7 +4,7 @@ Class {
 	#instVars : [
 		'manager'
 	],
-	#category : #PlayMod
+	#category : #'PlayMod-Modules-Imports-Classes'
 }
 
 { #category : #specs }
@@ -14,6 +14,12 @@ Tabs_PlayMod class >> defaultSpec [
 	^ SpecLayout composed
 		add: #manager;
 		yourself
+]
+
+{ #category : #example }
+Tabs_PlayMod class >> example [
+	<sampleInstance>
+	^ self new openWithSpec
 ]
 
 { #category : #initialization }
@@ -46,7 +52,7 @@ Tabs_PlayMod >> manager [
 { #category : #initialization }
 Tabs_PlayMod >> moduleInspectorTab [
 	|tab module|
-	module := MLModuleExample new runExample .
+	module := MLModuleRegistry global at: #SNAP.
 	tab := self newTab.
 	tab
 		label: 'Module inspector';

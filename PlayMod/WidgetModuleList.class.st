@@ -4,7 +4,7 @@ Class {
 	#instVars : [
 		'listModule'
 	],
-	#category : #PlayMod
+	#category : #'PlayMod-Modules-Imports-Classes'
 }
 
 { #category : #specs }

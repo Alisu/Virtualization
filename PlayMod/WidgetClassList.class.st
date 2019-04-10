@@ -5,7 +5,7 @@ Class {
 		'label',
 		'classes'
 	],
-	#category : #PlayMod
+	#category : #'PlayMod-Modules-Imports-Classes'
 }
 
 { #category : #specs }

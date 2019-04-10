@@ -6,9 +6,10 @@ Class {
 		'imports',
 		'classes',
 		'undefined',
-		'text'
+		'text',
+		'moduleList'
 	],
-	#category : #PlayMod
+	#category : #'PlayMod-Modules-Imports-Classes'
 }
 
 { #category : #specs }
@@ -21,6 +22,21 @@ ModuleViewer class >> defaultSpec [
 				add: #classes;
 				add: #undefined ];
 		newRow: [ :row | row add: #text ] yourself
+]
+
+{ #category : #example }
+ModuleViewer class >> example [
+	<sampleInstance>
+	| example aCollection|
+	example := ModuleViewer new.
+	aCollection :=(OrderedCollection new).
+	aCollection add: (MLModule newNamed: 'Pouet1').
+	aCollection add: (MLModule newNamed: 'Pouet2').
+
+	example
+		moduleList: aCollection;
+		openWithSpec.
+		^example
 ]
 
 { #category : #accessing }
@@ -45,10 +61,8 @@ ModuleViewer >> importsIn: module [
 
 { #category : #initialization }
 ModuleViewer >> initializePresenter [
-|myModules lastModuleSelected|
-myModules:= OrderedCollection new.
-MLModuleRegistry global moduleEnvironment valuesDo:[:value|myModules add: value].
-modules items: myModules.
+|lastModuleSelected|
+
 modules whenSelectedItemChanged: [ :module|
 	imports resetSelection.
 	classes resetSelection.
@@ -83,7 +97,17 @@ classes label: 'Class'.
 undefined label:'Undefined'.
 self focusOrder add: modules; add: imports; add: classes; add: undefined; add: text.
 text aboutToStyle: true.
-text beForCode.
+"text beForCode."
+]
+
+{ #category : #accessing }
+ModuleViewer >> moduleList [
+	^ moduleList
+]
+
+{ #category : #accessing }
+ModuleViewer >> moduleList: aList [
+	self modules items: aList.
 ]
 
 { #category : #accessing }
