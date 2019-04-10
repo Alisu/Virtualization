@@ -55,19 +55,26 @@ ClassMethodModuleBrowser >> classes [
 { #category : #accessing }
 ClassMethodModuleBrowser >> classes: aList [
 
-	self listModel items: aList
+	self listModel items: (aList sort: [ :a :b | a name < b name ])
 ]
 
 { #category : #accessing }
 ClassMethodModuleBrowser >> initializePresenter [
-
+	| classSelected |
 	listModel
 		whenSelectionChangedDo: [ :selection | 
-			selection selectedItem
-				ifNotNil: [ :class |
-					self refreshMethods.
-					methodModel listModel unselectAll ] ].
-	methodModel acceptBlock: [ :t | self acceptMethodText: t ]
+			[ :selection | 
+			selection
+				ifNotNil: [ :class | 
+					classSelected := self listModel selection selectedItem.
+					methodModel
+						methods: (class methods sort: [ :a :b | a selector < b selector ]).
+					methodModel listModel unselectAll ] ]
+				cull: selection selectedItem ].
+	methodModel
+		acceptBlock: [ :t | 
+			classSelected environment compileMethod: t inClass: classSelected.
+			methodModel listModel unselectAll ]
 ]
 
 { #category : #accessing }

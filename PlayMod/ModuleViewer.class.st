@@ -240,7 +240,7 @@ ModuleViewer >> modules [
 { #category : #initialization }
 ModuleViewer >> refreshClasses [
 
-	classList items: (self classesIn: self selectedModule)
+	classList classes: (self classesIn: self selectedModule)
 ]
 
 { #category : #initialization }
@@ -284,7 +284,7 @@ ModuleViewer >> selectModule: aModule [
 { #category : #initialization }
 ModuleViewer >> selectedClass [
 
-	^ classList selectedItem
+	^ classList selectedClass
 ]
 
 { #category : #initialization }
