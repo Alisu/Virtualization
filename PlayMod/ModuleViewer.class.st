@@ -55,6 +55,8 @@ ModuleViewer >> acceptMethodText: aText [
 		compileMethod: aText
 		inClass: self selectedClass.
 	
+	self classList refreshMethods.
+	
 
 ]
 

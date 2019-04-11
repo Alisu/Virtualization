@@ -92,8 +92,7 @@ ClassMethodModuleBrowser >> methods [
 { #category : #accessing }
 ClassMethodModuleBrowser >> refreshMethods [
 
-	methodModel
-		items: (self selectedClass methods sort: [ :a :b | a selector < b selector ]).
+	methodModel items:(self selectedClass methods sort: [ :a :b | a selector < b selector ]).
 ]
 
 { #category : #selection }
