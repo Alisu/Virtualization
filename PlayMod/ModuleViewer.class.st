@@ -202,7 +202,8 @@ ModuleViewer >> initializePresenter [
 	importList
 		whenImportChanged: [ :import | import ifNotNil: [ importList resetSelection. self refreshTabs ] ].
 	classList
-		whenSelectedClassChangedDo: [ :class | class ifNotNil: [ self refreshTabs ] ]
+		whenSelectedClassChangedDo: [ :class | class ifNotNil: [ self refreshTabs ] ];
+		whenSelectedMethodChangedDo: [ :method | method ifNotNil: [ self refreshTabs ] ]
 ]
 
 { #category : #initialization }
@@ -289,8 +290,7 @@ ModuleViewer >> refreshClasses [
 { #category : #initialization }
 ModuleViewer >> refreshModuleList [
 	
-	self modules
-		items: (moduleRegistry moduleEnvironment values sorted: [:a :b | a name < b name ])
+	self modules items: (moduleRegistry moduleEnvironment values sorted: [:a :b | a name < b name ])
 ]
 
 { #category : #refreshing }

@@ -122,3 +122,9 @@ ClassMethodModuleBrowser >> whenSelectedClassChangedDo: aBlockClosure [
 	
 	listModel whenSelectionChangedDo: aBlockClosure
 ]
+
+{ #category : #events }
+ClassMethodModuleBrowser >> whenSelectedMethodChangedDo: aBlockClosure [ 
+	
+	methodModel whenSelectionChangedDo: aBlockClosure
+]
