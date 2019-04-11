@@ -37,6 +37,11 @@ ImportViewer >> importClasses [
 	^ importClasses
 ]
 
+{ #category : #'as yet unclassified' }
+ImportViewer >> importContextMenu: aMenuPresenter [ 
+	self imports importContextMenu: aMenuPresenter.
+]
+
 { #category : #accessing }
 ImportViewer >> imports [
 	^ imports

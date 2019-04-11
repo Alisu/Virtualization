@@ -16,6 +16,11 @@ WidgetImportList class >> defaultSpec [
 	yourself
 ]
 
+{ #category : #'as yet unclassified' }
+WidgetImportList >> importContextMenu: aMenuPresenter [ 
+	self imports contextMenu: aMenuPresenter.
+]
+
 { #category : #accessing }
 WidgetImportList >> imports [
 	^ imports

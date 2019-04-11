@@ -48,6 +48,12 @@ ModuleViewer >> acceptClassDefinition: aText [
 	self refreshClasses.
 ]
 
+{ #category : #class }
+ModuleViewer >> acceptImportDefinition: aText [
+	
+	self refreshClasses.
+]
+
 { #category : #method }
 ModuleViewer >> acceptMethodText: aText [
 
@@ -64,6 +70,26 @@ ModuleViewer >> acceptMethodText: aText [
 ModuleViewer >> acceptModuleDefinition: aText [
 
 self shouldBeImplemented .
+]
+
+{ #category : #initialization }
+ModuleViewer >> buildClassContextMenu [
+	^ self newMenu
+				addItem: [ :item | 
+					item
+						name: 'Remove';
+						action: [ self selectedClass environment removeClassNamed: self selectedClass name.
+							self refreshClasses.] ].
+]
+
+{ #category : #initialization }
+ModuleViewer >> buildImportContextMenu [
+	^ self newMenu
+				addItem: [ :item | 
+					item
+						name: 'Remove';
+						action: [ self selectedModule removeImport: self selectedImport.
+										self refreshMethods.] ].
 ]
 
 { #category : #initialization }
@@ -86,6 +112,17 @@ ModuleViewer >> buildMenu [
 							subitem
 								name: 'Import module...';
 								action: [ self importModule ] ]) ] ].
+]
+
+{ #category : #initialization }
+ModuleViewer >> buildMethodContextMenu [
+	^ self newMenu
+				addItem: [ :item | 
+					item
+						name: 'Remove';
+						action: [ self flag: #bug. "Call a method with bug flag"
+							self  selectedMethod methodClass environment removeSelector: self selectedMethod selector fromClassNamed: self selectedMethod methodClass name.
+							self refreshMethods.] ].
 ]
 
 { #category : #initialization }
@@ -177,7 +214,8 @@ ModuleViewer >> importDefinitionTab [
 		title: 'Import definition'
 		provider: [ 
 			self newText
-				text: (self selectedImport ifNotNil: #printString);
+				text: (self selectedImport ifNotNil: #printDeclaration);
+				acceptBlock: [ :someText | self acceptImportDefinition: someText ];
 				yourself ]
 ]
 
@@ -232,8 +270,11 @@ ModuleViewer >> initializePresenter [
 	modules
 		whenSelectionChangedDo: [ :selection | [ :module | self selectModule: module ] cull: selection selectedItem ].
 	importList
+		importContextMenu: self buildImportContextMenu;
 		whenImportChanged: [ :import | import ifNotNil: [ importList resetSelection. self refreshTabs ] ].
 	classList
+		classContextMenu: self buildClassContextMenu;
+		methodContextMenu: self buildMethodContextMenu;
 		whenSelectedClassChangedDo: [ :class | class ifNotNil: [ self refreshTabs ] ];
 		whenSelectedMethodChangedDo: [ :method | method ifNotNil: [ self refreshTabs ] ]
 ]
@@ -318,6 +359,12 @@ ModuleViewer >> modules [
 ModuleViewer >> refreshClasses [
 
 	classList classes: (self classesIn: self selectedModule)
+]
+
+{ #category : #initialization }
+ModuleViewer >> refreshMethods [
+
+	classList refreshMethods .
 ]
 
 { #category : #initialization }

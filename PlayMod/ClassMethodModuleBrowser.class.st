@@ -35,6 +35,11 @@ ClassMethodModuleBrowser class >> title [
 	^ 'Class Method Browser'
 ]
 
+{ #category : #'as yet unclassified' }
+ClassMethodModuleBrowser >> classContextMenu: aMenuPresenter [ 
+	self listModel contextMenu: aMenuPresenter.
+]
+
 { #category : #accessing }
 ClassMethodModuleBrowser >> classes [
 	
@@ -75,6 +80,11 @@ ClassMethodModuleBrowser >> initializeWidgets [
 ClassMethodModuleBrowser >> listModel [
 
 	^ listModel
+]
+
+{ #category : #'as yet unclassified' }
+ClassMethodModuleBrowser >> methodContextMenu: aMenuPresenter [ 
+	self methodModel contextMenu: aMenuPresenter.
 ]
 
 { #category : #accessing }
