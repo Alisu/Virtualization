@@ -90,6 +90,11 @@ ImportViewer >> resetSelection [
 imports resetSelection
 ]
 
+{ #category : #'as yet unclassified' }
+ImportViewer >> selectedImport [
+	^ imports selectedImport
+]
+
 { #category : #initialization }
 ImportViewer >> title [
 ^ 'Module viewer'

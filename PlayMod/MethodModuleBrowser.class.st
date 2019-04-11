@@ -115,6 +115,11 @@ MethodModuleBrowser >> methods: aList [
 	self listModel items: aList
 ]
 
+{ #category : #focus }
+MethodModuleBrowser >> selectedMethod [
+	^ listModel selection selectedItem
+]
+
 { #category : #api }
 MethodModuleBrowser >> sortingBlock: aBlock [ 
 

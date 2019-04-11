@@ -39,6 +39,12 @@ ModuleBrowserTest >> testSelectClassShowsMethods [
 ]
 
 { #category : #tests }
+ModuleBrowserTest >> testSelectImportsShowDefintion [
+
+self flag: #TODO.
+]
+
+{ #category : #tests }
 ModuleBrowserTest >> testSelectModuleUpdatesClasses [
 
 	browser selectModule: module.

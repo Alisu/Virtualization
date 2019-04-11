@@ -55,6 +55,11 @@ WidgetImportList >> resetSelection [
 	imports unselectAll
 ]
 
+{ #category : #'as yet unclassified' }
+WidgetImportList >> selectedImport [
+	^ imports selection selectedItem
+]
+
 { #category : #initialization }
 WidgetImportList >> title [
 ^ 'Imports widget'

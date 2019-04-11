@@ -1,3 +1,6 @@
+"
+(ModuleViewer on: MLModuleRegistry global) openWithSpec.
+"
 Class {
 	#name : #ModuleViewer,
 	#superclass : #ComposablePresenter,
@@ -10,7 +13,8 @@ Class {
 		'moduleContentsNotebook',
 		'undeclaredList',
 		'classList',
-		'importList'
+		'importList',
+		'variableList'
 	],
 	#category : #'PlayMod-Modules-Imports-Classes'
 }
@@ -30,26 +34,34 @@ ModuleViewer class >> defaultSpec [
 { #category : #example }
 ModuleViewer class >> example [
 	<sampleInstance>
-	| example aCollection|
-	example := ModuleViewer new.
-	aCollection :=(OrderedCollection new).
-	aCollection add: (MLModule newNamed: 'Pouet1').
-	aCollection add: (MLModule newNamed: 'Pouet2').
 
-	example
-		moduleList: MLModuleRegistry global moduleEnvironment values;
-		openWithSpec.
-		^example
+	(ModuleViewer on: MLModuleRegistry global) openWithSpec.
 ]
 
-{ #category : #actions }
-ModuleViewer >> acceptDefinition: aText [
+{ #category : #class }
+ModuleViewer >> acceptClassDefinition: aText [
 	
 	| classDefinition |
 	classDefinition := CDClassDefinitionParser parse: aText asString.
 	self selectedModule declareClass: classDefinition.
 	
 	self refreshClasses.
+]
+
+{ #category : #method }
+ModuleViewer >> acceptMethodText: aText [
+
+	self selectedClass environment
+		compileMethod: aText
+		inClass: self selectedClass.
+	
+
+]
+
+{ #category : #actions }
+ModuleViewer >> acceptModuleDefinition: aText [
+
+self shouldBeImplemented .
 ]
 
 { #category : #initialization }
@@ -66,11 +78,15 @@ ModuleViewer >> buildMenu [
 								action: [ self createModule ] ];
 						addItem: [ :subitem | 
 							subitem
-								name: 'Import...';
+								name: 'Import package...';
+								action: [ self importModule ] ];
+						addItem: [ :subitem | 
+							subitem
+								name: 'Import module...';
 								action: [ self importModule ] ]) ] ].
 ]
 
-{ #category : #initialization }
+{ #category : #class }
 ModuleViewer >> classDefinitionTab [
 	
 	^ NotebookPage
@@ -78,7 +94,7 @@ ModuleViewer >> classDefinitionTab [
 		provider: [ 
 			self newText
 				text: (self selectedClass ifNotNil: #definitionNew);
-				acceptBlock: [ :someText | self acceptDefinition: someText ];
+				acceptBlock: [ :someText | self acceptClassDefinition: someText ];
 				yourself ]
 ]
 
@@ -119,6 +135,16 @@ ModuleViewer >> createModule [
 { #category : #accessing }
 ModuleViewer >> definitionsNotebook [
 	^ definitionsNotebook
+]
+
+{ #category : #initialize }
+ModuleViewer >> importDefinitionTab [
+	^ NotebookPage
+		title: 'Import definition'
+		provider: [ 
+			self newText
+				text: (self selectedImport ifNotNil: #printString);
+				yourself ]
 ]
 
 { #category : #components }
@@ -169,13 +195,12 @@ ModuleViewer >> initializePresenter [
 	self modules displayBlock: [ :aModule | aModule name ].
 	self refreshModuleList.
 	self refreshTabs.
-	
 	modules
 		whenSelectionChangedDo: [ :selection | [ :module | self selectModule: module ] cull: selection selectedItem ].
-	importList 
-		whenImportChanged: [ :import | import ifNotNil: [ importList resetSelection ] ].
-	classList whenSelectedClassChangedDo: [ :class | 
-		class ifNotNil: [ self refreshTabs ] ]
+	importList
+		whenImportChanged: [ :import | import ifNotNil: [ importList resetSelection. self refreshTabs ] ].
+	classList
+		whenSelectedClassChangedDo: [ :class | class ifNotNil: [ self refreshTabs ] ]
 ]
 
 { #category : #initialization }
@@ -188,12 +213,15 @@ ModuleViewer >> initializeWidgets [
 	moduleContentsNotebook
 		addPage: self classListTab;
 		addPage: self importListTab;
+		addPage: self variableListTab;
 		addPage: self undeclaredListTab.
 	
 	definitionsNotebook := self newNotebook.
 	definitionsNotebook
 		addPage: self moduleDefinitionTab;
-		addPage: self classDefinitionTab.
+		addPage: self classDefinitionTab;
+		addPage: self importDefinitionTab;
+		addPage: self methodDefinitionTab.
 	
 	self focusOrder
 		add: modules;
@@ -201,14 +229,25 @@ ModuleViewer >> initializeWidgets [
 		add: classList;
 		add: undeclaredList;
 		add: definitionsNotebook.
-"	text aboutToStyle: true"
-	"text beForCode."
+
 ]
 
 { #category : #actions }
 ModuleViewer >> initializeWindow: aWindow [
 
 	aWindow initialExtent: 1000@800
+]
+
+{ #category : #method }
+ModuleViewer >> methodDefinitionTab [
+	^ NotebookPage
+		title: 'Method definition'
+		provider: [ 
+			self newText
+				aboutToStyle: true;
+				text: (self selectedMethod ifNotNil: #sourceCode);
+				acceptBlock: [ :someText | self acceptMethodText: someText ];
+				yourself ]
 ]
 
 { #category : #initialization }
@@ -218,7 +257,9 @@ ModuleViewer >> moduleDefinitionTab [
 		title: 'Module definition'
 		provider: [ 
 			self newText
+				aboutToStyle: true;
 				text: (self selectedModule ifNotNil: #printDeclaration);
+				acceptBlock: [ :someText | self acceptModuleDefinition: someText ];
 				yourself ]
 ]
 
@@ -278,6 +319,7 @@ ModuleViewer >> selectModule: aModule [
 		importList imports: (self importsIn: aModule).
 		classList classes: (self classesIn: aModule).
 		undeclaredList items: (self undefinedIn: aModule).
+		variableList items: (self variableIn: aModule).
 		self refreshTabs ]
 ]
 
@@ -285,6 +327,16 @@ ModuleViewer >> selectModule: aModule [
 ModuleViewer >> selectedClass [
 
 	^ classList selectedClass
+]
+
+{ #category : #'as yet unclassified' }
+ModuleViewer >> selectedImport [
+	^ importList selectedImport
+]
+
+{ #category : #method }
+ModuleViewer >> selectedMethod [
+	^ classList selectedMethod
 ]
 
 { #category : #initialization }
@@ -337,6 +389,23 @@ ModuleViewer >> undefined [
 { #category : #accessing }
 ModuleViewer >> undefinedIn: module [
 ^ (module undeclaredNames).
+]
+
+{ #category : #accessing }
+ModuleViewer >> variableIn: module [
+^ (module variableNames).
+]
+
+{ #category : #accessing }
+ModuleViewer >> variableList [
+	^variableList 
+]
+
+{ #category : #'as yet unclassified' }
+ModuleViewer >> variableListTab [
+	^ NotebookPage
+		title: 'Variables'
+		provider: (variableList := self instantiate: WidgetClassList)
 ]
 
 { #category : #'as yet unclassified' }
