@@ -88,6 +88,38 @@ ModuleViewer >> buildMenu [
 								action: [ self importModule ] ]) ] ].
 ]
 
+{ #category : #initialization }
+ModuleViewer >> buildModuleContextMenu [
+	^ self newMenu
+				addItem: [ :item | 
+					item
+						name: 'Remove';
+						action: [ moduleRegistry removeKey: self selectedModule name.
+							self refreshModuleList.] ].
+]
+
+{ #category : #initialization }
+ModuleViewer >> buildToolBarMenu [
+
+	^ self newMenuBar addGroup: [ :group | 
+			group addItem: [ :item | 
+				item
+					name: 'File';
+					subMenu: (self newMenu
+						addItem: [ :subitem | 
+							subitem
+								name: 'New...';
+								action: [ self createModule ] ];
+						addItem: [ :subitem | 
+							subitem
+								name: 'Import package...';
+								action: [ self importModule ] ];
+						addItem: [ :subitem | 
+							subitem
+								name: 'Import module...';
+								action: [ self importModule ] ]) ] ].
+]
+
 { #category : #class }
 ModuleViewer >> classDefinitionTab [
 	
@@ -209,8 +241,9 @@ ModuleViewer >> initializePresenter [
 { #category : #initialization }
 ModuleViewer >> initializeWidgets [
 
-	menu := self buildMenu.
+	menu := self buildToolBarMenu.
 	modules := self newList.
+	modules contextMenu: self buildModuleContextMenu.
 	
 	moduleContentsNotebook := self newNotebook.
 	moduleContentsNotebook
