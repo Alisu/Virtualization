@@ -50,8 +50,10 @@ ModuleViewer >> acceptClassDefinition: aText [
 
 { #category : #class }
 ModuleViewer >> acceptImportDefinition: aText [
-	
-	self refreshClasses.
+	|import|
+	import := OpalCompiler new evaluate: aText.
+	self selectedModule addImport: import.
+	self refreshImports.
 ]
 
 { #category : #method }
@@ -69,7 +71,10 @@ ModuleViewer >> acceptMethodText: aText [
 { #category : #actions }
 ModuleViewer >> acceptModuleDefinition: aText [
 
-self shouldBeImplemented .
+	|module|
+	module := OpalCompiler new evaluate: aText.
+	moduleRegistry registerModule: module.
+	self refreshModuleList.
 ]
 
 { #category : #initialization }
@@ -79,7 +84,11 @@ ModuleViewer >> buildClassContextMenu [
 					item
 						name: 'Remove';
 						action: [ self selectedClass environment removeClassNamed: self selectedClass name.
-							self refreshClasses.] ].
+							self refreshClasses.] ];
+				addItem: [ :item | 
+					item
+						name: 'Inspect';
+						action: [ self selectedClass inspect] ].
 ]
 
 { #category : #initialization }
@@ -89,7 +98,11 @@ ModuleViewer >> buildImportContextMenu [
 					item
 						name: 'Remove';
 						action: [ self selectedModule removeImport: self selectedImport.
-										self refreshMethods.] ].
+										self refreshImports.] ];
+				addItem: [ :item | 
+					item
+						name: 'Inspect';
+						action: [ self selectedImport inspect] ].
 ]
 
 { #category : #initialization }
@@ -122,7 +135,11 @@ ModuleViewer >> buildMethodContextMenu [
 						name: 'Remove';
 						action: [ self flag: #bug. "Call a method with bug flag"
 							self  selectedMethod methodClass environment removeSelector: self selectedMethod selector fromClassNamed: self selectedMethod methodClass name.
-							self refreshMethods.] ].
+							self refreshMethods.] ];
+				addItem: [ :item | 
+					item
+						name: 'Inspect';
+						action: [ self selectedMethod inspect] ].
 ]
 
 { #category : #initialization }
@@ -132,7 +149,11 @@ ModuleViewer >> buildModuleContextMenu [
 					item
 						name: 'Remove';
 						action: [ moduleRegistry removeKey: self selectedModule name.
-							self refreshModuleList.] ].
+							self refreshModuleList.] ];
+				addItem: [ :item | 
+					item
+						name: 'Inspect';
+						action: [ self selectedModule inspect] ].
 ]
 
 { #category : #initialization }
@@ -297,8 +318,9 @@ ModuleViewer >> initializeWidgets [
 	definitionsNotebook
 		addPage: self moduleDefinitionTab;
 		addPage: self classDefinitionTab;
-		addPage: self importDefinitionTab;
-		addPage: self methodDefinitionTab.
+		addPage: self methodDefinitionTab;
+		addPage: self importDefinitionTab.
+
 	
 	self focusOrder
 		add: modules;
@@ -359,6 +381,12 @@ ModuleViewer >> modules [
 ModuleViewer >> refreshClasses [
 
 	classList classes: (self classesIn: self selectedModule)
+]
+
+{ #category : #initialization }
+ModuleViewer >> refreshImports [
+
+	importList imports: (self importsIn: self selectedModule)
 ]
 
 { #category : #initialization }
