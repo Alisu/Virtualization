@@ -69,7 +69,10 @@ ModuleViewer >> acceptMethodText: aText [
 { #category : #actions }
 ModuleViewer >> acceptModuleDefinition: aText [
 
-self shouldBeImplemented .
+	|module|
+	module := OpalCompiler new evaluate: aText.
+	moduleRegistry registerModule: module.
+	self refreshModuleList.
 ]
 
 { #category : #initialization }
@@ -132,7 +135,11 @@ ModuleViewer >> buildModuleContextMenu [
 					item
 						name: 'Remove';
 						action: [ moduleRegistry removeKey: self selectedModule name.
-							self refreshModuleList.] ].
+							self refreshModuleList.] ];
+				addItem: [ :item | 
+					item
+						name: 'Inspect';
+						action: [ self selectedModule inspect] ].
 ]
 
 { #category : #initialization }
@@ -297,8 +304,9 @@ ModuleViewer >> initializeWidgets [
 	definitionsNotebook
 		addPage: self moduleDefinitionTab;
 		addPage: self classDefinitionTab;
-		addPage: self importDefinitionTab;
-		addPage: self methodDefinitionTab.
+		addPage: self methodDefinitionTab;
+		addPage: self importDefinitionTab.
+
 	
 	self focusOrder
 		add: modules;
@@ -359,6 +367,12 @@ ModuleViewer >> modules [
 ModuleViewer >> refreshClasses [
 
 	classList classes: (self classesIn: self selectedModule)
+]
+
+{ #category : #initialization }
+ModuleViewer >> refreshImports [
+
+	importList imports: (self importsIn: self selectedModule)
 ]
 
 { #category : #initialization }
