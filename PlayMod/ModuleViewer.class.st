@@ -91,6 +91,29 @@ ModuleViewer >> buildClassContextMenu [
 						action: [ self selectedClass inspect] ].
 ]
 
+{ #category : #'as yet unclassified' }
+ModuleViewer >> buildDefinitionNotebook: aPage. [
+	
+	self flag: #BadCode. "Have the string Imports and Classes as variables somewhere pls"
+
+	"remove all definition except module definition page"
+	definitionsNotebook removePage: definitionsNotebook pagesNumber - 1.
+	
+	"add the correct pages in definition panel according to the page selected"
+	(aPage title = 'Imports')
+		ifTrue:[  definitionsNotebook 
+			addPage: self importDefinitionTab.
+			].
+	(aPage title = 'Classes')
+		ifTrue:[definitionsNotebook 
+			addPage: self classDefinitionTab;
+			addPage: self methodDefinitionTab.
+			].
+		self needRebuild: false.
+		self buildWithSpec.
+	
+]
+
 { #category : #initialization }
 ModuleViewer >> buildImportContextMenu [
 	^ self newMenu
@@ -176,6 +199,17 @@ ModuleViewer >> buildToolBarMenu [
 							subitem
 								name: 'Import module...';
 								action: [ self importModule ] ]) ] ].
+]
+
+{ #category : #initialization }
+ModuleViewer >> buildUndeclaredContextMenu [
+	^ self newMenu
+				addItem: [ :item | 
+					item
+						name: 'Declare as import';
+						action: [ self error: 'Feature not implemented'.
+							self refreshClasses.] ].
+
 ]
 
 { #category : #class }
@@ -288,6 +322,8 @@ ModuleViewer >> initializePresenter [
 	self modules displayBlock: [ :aModule | aModule name ].
 	self refreshModuleList.
 	self refreshTabs.
+	moduleContentsNotebook 
+		whenSelectedPageChangedDo: [:page | self buildDefinitionNotebook: page].
 	modules
 		whenSelectionChangedDo: [ :selection | [ :module | self selectModule: module ] cull: selection selectedItem ].
 	importList
@@ -297,7 +333,9 @@ ModuleViewer >> initializePresenter [
 		classContextMenu: self buildClassContextMenu;
 		methodContextMenu: self buildMethodContextMenu;
 		whenSelectedClassChangedDo: [ :class | class ifNotNil: [ self refreshTabs ] ];
-		whenSelectedMethodChangedDo: [ :method | method ifNotNil: [ self refreshTabs ] ]
+		whenSelectedMethodChangedDo: [ :method | method ifNotNil: [ self refreshTabs ] ].
+	undeclaredList 
+		classContextMenu: self buildUndeclaredContextMenu.
 ]
 
 { #category : #initialization }
@@ -316,10 +354,7 @@ ModuleViewer >> initializeWidgets [
 	
 	definitionsNotebook := self newNotebook.
 	definitionsNotebook
-		addPage: self moduleDefinitionTab;
-		addPage: self classDefinitionTab;
-		addPage: self methodDefinitionTab;
-		addPage: self importDefinitionTab.
+		addPage: self moduleDefinitionTab.
 
 	
 	self focusOrder
