@@ -41,9 +41,11 @@ ModuleViewer class >> example [
 { #category : #class }
 ModuleViewer >> acceptClassDefinition: aText [
 	
-	| classDefinition |
-	classDefinition := CDClassDefinitionParser parse: aText asString.
-	self selectedModule declareClass: classDefinition.
+	| aDefinition |
+	aDefinition := CDClassDefinitionParser parse: aText asString.
+	aDefinition isClassDefinition
+	ifTrue:[self selectedModule declareClass: aDefinition.]
+	ifFalse:[self selectedModule declareTrait: aDefinition.].
 	
 	self refreshClasses.
 ]
@@ -58,14 +60,9 @@ ModuleViewer >> acceptImportDefinition: aText [
 
 { #category : #method }
 ModuleViewer >> acceptMethodText: aText [
-
-	self selectedClass environment
-		compileMethod: aText
-		inClass: self selectedClass.
 	
-	self classList refreshMethods.
-	
-
+	self selectedClass compile: aText.
+	self classList refreshMethods
 ]
 
 { #category : #actions }
@@ -120,7 +117,7 @@ ModuleViewer >> buildImportContextMenu [
 				addItem: [ :item | 
 					item
 						name: 'Remove';
-						action: [ self selectedModule removeImport: self selectedImport.
+						action: [ self selectedModule removeImport: self selectedImport aliasName.
 										self refreshImports.] ];
 				addItem: [ :item | 
 					item
@@ -176,7 +173,11 @@ ModuleViewer >> buildModuleContextMenu [
 				addItem: [ :item | 
 					item
 						name: 'Inspect';
-						action: [ self selectedModule inspect] ].
+						action: [ self selectedModule inspect] ];
+				addItem: [ :item | 
+					item
+						name: 'Bind imports to registry';
+						action: [ self selectedModule bindTo: moduleRegistry ] ].
 ]
 
 { #category : #initialization }
@@ -321,19 +322,24 @@ ModuleViewer >> importsIn: module [
 ModuleViewer >> initializePresenter [
 	self modules displayBlock: [ :aModule | aModule name ].
 	self refreshModuleList.
-	self refreshTabs.
+	self refreshDefinitionTabs.
+	
 	moduleContentsNotebook 
 		whenSelectedPageChangedDo: [:page | self buildDefinitionNotebook: page].
+	
 	modules
 		whenSelectionChangedDo: [ :selection | [ :module | self selectModule: module ] cull: selection selectedItem ].
+	
 	importList
 		importContextMenu: self buildImportContextMenu;
-		whenImportChanged: [ :import | import ifNotNil: [ importList resetSelection. self refreshTabs ] ].
+		whenImportChanged: [ :import | import ifNotNil: [ importList resetSelection. self refreshDefinitionTabs ] ].
+	
 	classList
 		classContextMenu: self buildClassContextMenu;
 		methodContextMenu: self buildMethodContextMenu;
-		whenSelectedClassChangedDo: [ :class | class ifNotNil: [ self refreshTabs ] ];
-		whenSelectedMethodChangedDo: [ :method | method ifNotNil: [ self refreshTabs ] ].
+		whenSelectedClassChangedDo: [ :class | class ifNotNil: [ self refreshDefinitionTabs ] ];
+		whenSelectedMethodChangedDo: [ :method | method ifNotNil: [ self refreshDefinitionTabs ] ].
+	
 	undeclaredList 
 		classContextMenu: self buildUndeclaredContextMenu.
 ]
@@ -418,6 +424,18 @@ ModuleViewer >> refreshClasses [
 	classList classes: (self classesIn: self selectedModule)
 ]
 
+{ #category : #refreshing }
+ModuleViewer >> refreshContentTabs [
+	
+	moduleContentsNotebook resetAllPageContents
+]
+
+{ #category : #refreshing }
+ModuleViewer >> refreshDefinitionTabs [
+	
+	definitionsNotebook resetAllPageContents
+]
+
 { #category : #initialization }
 ModuleViewer >> refreshImports [
 
@@ -465,7 +483,7 @@ ModuleViewer >> selectModule: aModule [
 		classList classes: (self classesIn: aModule).
 		undeclaredList items: (self undefinedIn: aModule).
 		variableList items: (self variableIn: aModule).
-		self refreshTabs ]
+		self refreshDefinitionTabs. ]
 ]
 
 { #category : #initialization }
