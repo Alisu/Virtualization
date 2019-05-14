@@ -16,6 +16,11 @@ WidgetClassList class >> defaultSpec [
 	yourself
 ]
 
+{ #category : #'as yet unclassified' }
+WidgetClassList >> classContextMenu: aMenuPresenter [ 
+	self classes contextMenu: aMenuPresenter.
+]
+
 { #category : #accessing }
 WidgetClassList >> classes [
 	^ classes
