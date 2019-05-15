@@ -89,12 +89,12 @@ ModuleViewer >> buildClassContextMenu [
 ]
 
 { #category : #'as yet unclassified' }
-ModuleViewer >> buildDefinitionNotebook: aPage. [
+ModuleViewer >> buildDefinitionNotebook: aPage [.
 	
 	self flag: #BadCode. "Have the string Imports and Classes as variables somewhere pls"
 
 	"remove all definition except module definition page"
-	definitionsNotebook removePage: definitionsNotebook pagesNumber - 1.
+	definitionsNotebook removeLastPages: definitionsNotebook pagesNumber - 1.
 	
 	"add the correct pages in definition panel according to the page selected"
 	(aPage title = 'Imports')
