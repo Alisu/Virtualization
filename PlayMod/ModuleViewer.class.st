@@ -246,7 +246,7 @@ ModuleViewer >> classes [
 
 { #category : #'as yet unclassified' }
 ModuleViewer >> classesIn: module [
-^ (module classes).
+^ (module classesAndTraits).
 ]
 
 { #category : #actions }
