@@ -31,6 +31,10 @@ MuTalkVirtualizationExample >> buildModule [
 	module := MLModule
 		createFromSnapshot: version snapshot
 		moduleName: 'Mutalk'.
-	
+	^ module
+]
 
+{ #category : #accessing }
+MuTalkVirtualizationExample >> module [
+	^ module
 ]

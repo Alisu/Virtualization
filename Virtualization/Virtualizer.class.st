@@ -28,7 +28,6 @@ Virtualizer >> createVirtualizationLayer: aVirtualizationStrategy [
 		do: [ :import| aVirtualizationStrategy
 						resolveName: import
 						inVirtualizer: self ].
-1halt.
 	"Using bindToWithList can be a better idea"
 	virtualizationLayer bindTo: MLModuleRegistry global.
 	virtualizedModule bindTo: MLModuleRegistry global
