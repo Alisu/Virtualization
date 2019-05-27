@@ -9,6 +9,15 @@ Class {
 	#category : #'Virtualization-Strategies'
 }
 
+{ #category : #accessing }
+VirtualizationKernelIndirectionClassStrategy >> classDefinition: aName [
+	
+	| kernel |
+	kernel := (MLModuleRegistry global at: #Kernel).
+	
+^ aName, 'Kernel', (kernel definedClassNamed: aName) kindOfSubclass , aName
+]
+
 { #category : #'as yet unclassified' }
 VirtualizationKernelIndirectionClassStrategy >> initializeVirtualizationLayer: aVirtualizationModule [
 "We do nothing we don't need a prerequisites for this strategy"
@@ -25,7 +34,7 @@ VirtualizationKernelIndirectionClassStrategy >> resolveName: import inVirtualize
 		ifTrue: [ aVirtualizer virtualizationLayer
 				declareClass:
 					(CDClassDefinitionParser
-						parse: import aliasName, 'Kernel subclass: ' , import aliasName).
+						parse: (self classDefinition: import aliasName )).
 				aVirtualizer virtualizationLayer
 				declareImport: import aliasName
 				from: #Kernel

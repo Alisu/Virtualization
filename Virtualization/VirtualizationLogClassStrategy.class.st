@@ -29,6 +29,6 @@ VirtualizationLogClassStrategy >> initializeVirtualizationLayer: aVirtualization
 { #category : #'as yet unclassified' }
 VirtualizationLogClassStrategy >> resolveName: import inVirtualizer: aVirtualizer [
 
-	aVirtualizer virtualizationLayer declareClass: (CDClassDefinitionParser parse: 'LogClass subclass: ' , import aliasName).
+	aVirtualizer virtualizationLayer declareClass: (CDClassDefinitionParser parse: 'Object subclass: ' , import aliasName).
 	import bindingSourceName: (aVirtualizer virtualizationLayer name).
 ]
