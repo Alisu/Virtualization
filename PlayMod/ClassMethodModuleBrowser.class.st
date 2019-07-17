@@ -2,8 +2,9 @@ Class {
 	#name : #ClassMethodModuleBrowser,
 	#superclass : #ComposablePresenter,
 	#instVars : [
-		'listModel',
-		'methodModel'
+		'classModel',
+		'instanceMethodModel',
+		'classMethodModel'
 	],
 	#category : #'PlayMod-Modules-Imports-Classes'
 }
@@ -13,8 +14,9 @@ ClassMethodModuleBrowser class >> defaultSpec [
 <spec>
 	^ SpecLayout composed
 		newRow: [:row | row
-			add: #listModel width: 300;
-			add: #methodModel ];
+			add: #classModel width: 300;
+			add: #instanceMethodModel;
+			add: #classMethodModel. ];
 		yourself
 ]
 
@@ -24,7 +26,7 @@ ClassMethodModuleBrowser class >> example [
 	| example |
 	example := ClassMethodModuleBrowser new.
 	example
-		classes: (MLModuleRegistry global at:#SNAP) environment values;
+		classes: (MLModuleRegistry global at:#Kernel) environment values;
 		openWithSpec.
 		^example
 ]
@@ -37,104 +39,120 @@ ClassMethodModuleBrowser class >> title [
 
 { #category : #'as yet unclassified' }
 ClassMethodModuleBrowser >> classContextMenu: aMenuPresenter [ 
-	self listModel contextMenu: aMenuPresenter.
+	self classModel contextMenu: aMenuPresenter.
+]
+
+{ #category : #accessing }
+ClassMethodModuleBrowser >> classMethodModel [
+	^ classMethodModel
+]
+
+{ #category : #accessing }
+ClassMethodModuleBrowser >> classModel [
+	^ classModel
 ]
 
 { #category : #accessing }
 ClassMethodModuleBrowser >> classes [
 	
-	^ listModel items
+	^ classModel items
 ]
 
 { #category : #accessing }
 ClassMethodModuleBrowser >> classes: aList [
 
-	self listModel items: (aList sort: [ :a :b | a name < b name ])
+	self classModel items: (aList sort: [ :a :b | a name < b name ])
 ]
 
 { #category : #accessing }
 ClassMethodModuleBrowser >> initializePresenter [
 
-	listModel
+	classModel
 		whenSelectionChangedDo:
 			[ self selectedClass
 				ifNotNil: [ 
-					methodModel
-						items: (self selectedClass  methods sort: [ :a :b | a selector < b selector ]).
-					methodModel unselectAll ] ]
+					instanceMethodModel items: (self selectedClass  methods sort: [ :a :b | a selector < b selector ]).
+					instanceMethodModel unselectAll.
+					classMethodModel items: (self selectedClass classSide methods sort: [ :a :b | a selector < b selector ]).
+					classMethodModel unselectAll.				
+					 ] ]
 				
 
 ]
 
 { #category : #accessing }
 ClassMethodModuleBrowser >> initializeWidgets [
-	listModel := self instantiate:  ListPresenter.
-	methodModel := self instantiate: ListPresenter.
+	classModel := self instantiate:  ListPresenter.
+	instanceMethodModel := self instantiate: ListPresenter.
+	classMethodModel := self instantiate: ListPresenter.
 	self focusOrder
-		add: listModel;
-		add: methodModel.
-	methodModel displayBlock: [ :method | method selector ]
+		add: classModel;
+		add: instanceMethodModel;
+		add: classMethodModel.
+	instanceMethodModel displayBlock: [ :method | method selector ].
+	classMethodModel displayBlock: [ :method | method selector ]
 ]
 
 { #category : #accessing }
-ClassMethodModuleBrowser >> listModel [
-
-	^ listModel
+ClassMethodModuleBrowser >> instanceMethodModel [
+	^ instanceMethodModel
 ]
 
 { #category : #'as yet unclassified' }
 ClassMethodModuleBrowser >> methodContextMenu: aMenuPresenter [ 
-	self methodModel contextMenu: aMenuPresenter.
-]
-
-{ #category : #accessing }
-ClassMethodModuleBrowser >> methodModel [
-
-	^ methodModel
-]
-
-{ #category : #accessing }
-ClassMethodModuleBrowser >> methods [
 	
-	^ methodModel items
+	self classMethodModel contextMenu: aMenuPresenter.
+	self instanceMethodModel contextMenu: aMenuPresenter.
 ]
 
 { #category : #accessing }
 ClassMethodModuleBrowser >> refreshMethods [
 
-	methodModel items:(self selectedClass methods sort: [ :a :b | a selector < b selector ]).
+	instanceMethodModel items:(self selectedClass methods sort: [ :a :b | a selector < b selector ]).
+	classMethodModel items:(self selectedClass classSide methods sort: [ :a :b | a selector < b selector ]).
 ]
 
 { #category : #selection }
 ClassMethodModuleBrowser >> selectClass: aClass [ 
 	
-	listModel selectItem: aClass
+	classModel selectItem: aClass
 ]
 
 { #category : #accessing }
 ClassMethodModuleBrowser >> selectedClass [
-	^ listModel selection selectedItem
+	^ classModel selection selectedItem
 ]
 
 { #category : #accessing }
-ClassMethodModuleBrowser >> selectedMethod [
-	^ methodModel selection selectedItem
+ClassMethodModuleBrowser >> selectedClassMethod [
+	^ classMethodModel selection selectedItem
+]
+
+{ #category : #accessing }
+ClassMethodModuleBrowser >> selectedInstanceMethod [
+	^ instanceMethodModel selection selectedItem
 ]
 
 { #category : #selection }
 ClassMethodModuleBrowser >> unselectAll [
 	
-	listModel unselectAll
+	classModel unselectAll
 ]
 
 { #category : #events }
 ClassMethodModuleBrowser >> whenSelectedClassChangedDo: aBlockClosure [ 
 	
-	listModel whenSelectionChangedDo: aBlockClosure
+	classModel whenSelectionChangedDo: aBlockClosure
 ]
 
 { #category : #events }
-ClassMethodModuleBrowser >> whenSelectedMethodChangedDo: aBlockClosure [ 
+ClassMethodModuleBrowser >> whenSelectedClassMethodChangedDo: aBlockClosure [ 
 	
-	methodModel whenSelectionChangedDo: aBlockClosure
+	classMethodModel whenSelectionChangedDo: aBlockClosure
+]
+
+{ #category : #events }
+ClassMethodModuleBrowser >> whenSelectedInstanceMethodChangedDo: aBlockClosure [ 
+	
+	instanceMethodModel whenSelectionChangedDo: aBlockClosure
 ]

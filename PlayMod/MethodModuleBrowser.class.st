@@ -6,7 +6,7 @@ Class {
 		'textModel',
 		'toolbarModel'
 	],
-	#category : #'PlayMod-Classes-Methods'
+	#category : #'PlayMod-Modules-Imports-Classes'
 }
 
 { #category : #specs }

@@ -11,6 +11,7 @@ Class {
 		'menu',
 		'definitionsNotebook',
 		'moduleContentsNotebook',
+		'extensionList',
 		'undeclaredList',
 		'classList',
 		'importList',
@@ -154,7 +155,7 @@ ModuleViewer >> buildMethodContextMenu [
 				addItem: [ :item | 
 					item
 						name: 'Remove';
-						action: [ self flag: #bug. "Call a method with bug flag"
+						action: [ self flag: #bug. "Next call is a method with bug flag"
 							self  selectedMethod methodClass environment removeSelector: self selectedMethod selector fromClassNamed: self selectedMethod methodClass name.
 							self refreshMethods.] ];
 				addItem: [ :item | 
@@ -278,6 +279,14 @@ ModuleViewer >> definitionsNotebook [
 	^ definitionsNotebook
 ]
 
+{ #category : #tabs }
+ModuleViewer >> extensionListTab [
+		
+		^ NotebookPage
+		title: 'Extensions'
+		provider: (extensionList := self instantiate: WidgetClassList)
+]
+
 { #category : #initialize }
 ModuleViewer >> importDefinitionTab [
 	^ NotebookPage
@@ -352,7 +361,8 @@ ModuleViewer >> initializePresenter [
 		classContextMenu: self buildClassContextMenu;
 		methodContextMenu: self buildMethodContextMenu;
 		whenSelectedClassChangedDo: [ :class | class ifNotNil: [ self refreshDefinitionTabs ] ];
-		whenSelectedMethodChangedDo: [ :method | method ifNotNil: [ self refreshDefinitionTabs ] ].
+		whenSelectedInstanceMethodChangedDo: [ :method | method ifNotNil: [ self refreshDefinitionTabs ] ];
+		whenSelectedClassMethodChangedDo: [ :method | method ifNotNil: [ self refreshDefinitionTabs ] ].
 	
 	undeclaredList 
 		classContextMenu: self buildUndeclaredContextMenu.
@@ -370,7 +380,8 @@ ModuleViewer >> initializeWidgets [
 		addPage: self classListTab;
 		addPage: self importListTab;
 		addPage: self variableListTab;
-		addPage: self undeclaredListTab.
+		addPage: self undeclaredListTab;
+		addPage: self extensionListTab.
 	
 	definitionsNotebook := self newNotebook.
 	definitionsNotebook
@@ -393,12 +404,24 @@ ModuleViewer >> initializeWindow: aWindow [
 ]
 
 { #category : #method }
-ModuleViewer >> methodDefinitionTab [
+ModuleViewer >> instanceMethodDefinitionTab [
 	^ NotebookPage
-		title: 'Method definition'
+		title: 'Instance method definition'
 		provider: [ 
 			self newText
-				aboutToStyle: true;
+				"aboutToStyle: true;"
+				text: (self selectedMethod ifNotNil: #sourceCode);
+				acceptBlock: [ :someText | self acceptMethodText: someText ];
+				yourself ]
+]
+
+{ #category : #method }
+ModuleViewer >> methodDefinitionTab [
+	^ NotebookPage
+		title: 'method definition'
+		provider: [ 
+			self newText
+				"aboutToStyle: true;"
 				text: (self selectedMethod ifNotNil: #sourceCode);
 				acceptBlock: [ :someText | self acceptMethodText: someText ];
 				yourself ]
@@ -411,7 +434,7 @@ ModuleViewer >> moduleDefinitionTab [
 		title: 'Module definition'
 		provider: [ 
 			self newText
-				aboutToStyle: true;
+				"aboutToStyle: true;"
 				text: (self selectedModule ifNotNil: #printDeclaration);
 				acceptBlock: [ :someText | self acceptModuleDefinition: someText ];
 				yourself ]
