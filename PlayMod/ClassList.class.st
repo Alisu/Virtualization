@@ -1,15 +1,15 @@
 Class {
-	#name : #WidgetClassList,
+	#name : #ClassList,
 	#superclass : #ComposablePresenter,
 	#instVars : [
 		'label',
 		'classes'
 	],
-	#category : #'PlayMod-Modules-Imports-Classes'
+	#category : #'PlayMod-Class'
 }
 
 { #category : #specs }
-WidgetClassList class >> defaultSpec [
+ClassList class >> defaultSpec [
 ^ SpecColumnLayout composed
 	add: #label height: self toolbarHeight;
 	add: #classes;
@@ -17,17 +17,17 @@ WidgetClassList class >> defaultSpec [
 ]
 
 { #category : #'as yet unclassified' }
-WidgetClassList >> classContextMenu: aMenuPresenter [ 
+ClassList >> classContextMenu: aMenuPresenter [ 
 	self classes contextMenu: aMenuPresenter.
 ]
 
 { #category : #accessing }
-WidgetClassList >> classes [
+ClassList >> classes [
 	^ classes
 ]
 
 { #category : #initialization }
-WidgetClassList >> initializeWidgets [
+ClassList >> initializeWidgets [
 classes:= self newList.
 classes displayBlock: [ :m | m printString].
 label := self newLabel.
@@ -36,43 +36,43 @@ self focusOrder add: classes.
 ]
 
 { #category : #accessing }
-WidgetClassList >> items [
+ClassList >> items [
 
 	^ classes items
 ]
 
 { #category : #accessing }
-WidgetClassList >> items: aCollection [
+ClassList >> items: aCollection [
 classes items: aCollection
 ]
 
 { #category : #accessing }
-WidgetClassList >> label [
+ClassList >> label [
 	^ label
 ]
 
 { #category : #accessing }
-WidgetClassList >> label: aText [
+ClassList >> label: aText [
 label label: aText
 ]
 
 { #category : #accessing }
-WidgetClassList >> resetSelection [
+ClassList >> resetSelection [
 	classes unselectAll
 ]
 
 { #category : #accessing }
-WidgetClassList >> selectedItem [
+ClassList >> selectedItem [
 	^ classes selection selectedItem
 ]
 
 { #category : #initialization }
-WidgetClassList >> title [
+ClassList >> title [
 ^ 'Class widget'
 ]
 
 { #category : #accessing }
-WidgetClassList >> whenSelectedItemChanged: aBlock [
+ClassList >> whenSelectedItemChanged: aBlock [
 	classes
 		whenSelectionChangedDo: [ :selection | aBlock cull: selection selectedItem ]
 ]

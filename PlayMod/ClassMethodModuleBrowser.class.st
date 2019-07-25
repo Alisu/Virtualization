@@ -14,8 +14,8 @@ ClassMethodModuleBrowser class >> defaultSpec [
 <spec>
 	^ SpecLayout composed
 		newRow: [:row | row
-			add: #classModel width: 300;
-			add: #instanceMethodModel;
+			add: #classModel width: 250;
+			add: #instanceMethodModel width: 250;
 			add: #classMethodModel. ];
 		yourself
 ]
@@ -131,6 +131,11 @@ ClassMethodModuleBrowser >> selectedClassMethod [
 { #category : #accessing }
 ClassMethodModuleBrowser >> selectedInstanceMethod [
 	^ instanceMethodModel selection selectedItem
+]
+
+{ #category : #'as yet unclassified' }
+ClassMethodModuleBrowser >> selectedMethod [
+	^ self selectedClassMethod ifNil:[self selectedInstanceMethod]
 ]
 
 { #category : #selection }
