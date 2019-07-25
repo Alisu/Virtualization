@@ -57,15 +57,17 @@ module := MLModule createFromSnapshot: version snapshot moduleName: #NesTalk.
 
 { #category : #'as yet unclassified' }
 NesTalkVirtualizationExample >> configureHypervisor [
+| virtualizationLayer |
+virtualizationLayer := virtualizer virtualizationLayer.
 
-	virtualizer compileMethod: self SoureCodeMethodForOrdered inClass: (virtualizer classNamed: #OrderedCollection).
-	virtualizer declareImport: #ByteString from: #Kernel.
-	virtualizer bindTo: virtualizer defaultNameResolver.
-	virtualizer compileMethod: self SoureCodeMethodForString1 inClass: (virtualizer classNamed: #String) class.
-	virtualizer compileMethod: self SoureCodeMethodForString2 inClass: (virtualizer classNamed: #String) class.
+	virtualizationLayer compileMethod: self SoureCodeMethodForOrdered inClass: (virtualizationLayer classNamed: #OrderedCollection).
+	virtualizationLayer declareImport: #ByteString from: #Kernel.
+	virtualizationLayer bindTo: virtualizationLayer defaultNameResolver.
+	virtualizationLayer compileMethod: self SoureCodeMethodForString1 inClass: (virtualizationLayer classNamed: #String) class.
+	virtualizationLayer compileMethod: self SoureCodeMethodForString2 inClass: (virtualizationLayer classNamed: #String) class.
 	self flag: #Bad. "We need only to do this in one place not all of them"
-	self do: #binaryReadStreamDo: insteadOf: #readStreamDo:.
-	self do: #nothing insteadOf: #binary.
+	"self do: #binaryReadStreamDo: insteadOf: #readStreamDo:.
+	self do: #nothing insteadOf: #binary."
 	
 ]
 
@@ -128,4 +130,24 @@ NesTalkVirtualizationExample >> getAllMessageNodes: aSelector [
 	allMessagesNodes:= allMethods flatCollect: [:method | method sendNodes ].
 	nodesToAddML:=allMessagesNodes select: [:aNode| aNode selector = aSelector ].
 	^nodesToAddML 
+]
+
+{ #category : #accessing }
+NesTalkVirtualizationExample >> module [
+	^ module
+]
+
+{ #category : #accessing }
+NesTalkVirtualizationExample >> module: anObject [
+	module := anObject
+]
+
+{ #category : #accessing }
+NesTalkVirtualizationExample >> virtualizer [
+	^ virtualizer
+]
+
+{ #category : #accessing }
+NesTalkVirtualizationExample >> virtualizer: anObject [
+	virtualizer := anObject
 ]
