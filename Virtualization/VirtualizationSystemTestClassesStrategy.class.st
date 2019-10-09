@@ -24,9 +24,9 @@ VirtualizationSystemTestClassesStrategy >> classes: anObject [
 
 { #category : #initialization }
 VirtualizationSystemTestClassesStrategy >> initialize [ 
-self nextStrategy: VirtualizationLogClassStrategy  new.
+self nextStrategy: VirtualizationLogClassStrategy new.
 classes:= OrderedCollection new.
-classes add: #TestCase.
+classes add: #TestCase; add:#BabyMockTestCase.
 ]
 
 { #category : #initialization }

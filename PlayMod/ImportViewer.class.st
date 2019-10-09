@@ -6,7 +6,7 @@ Class {
 		'importClasses',
 		'fromModules'
 	],
-	#category : #'PlayMod-Modules-Imports-Classes'
+	#category : #'PlayMod-Import'
 }
 
 { #category : #specs }
@@ -76,9 +76,9 @@ importClasses whenSelectedItemChanged: [ :class |
 
 { #category : #initialization }
 ImportViewer >> initializeWidgets [
-imports  := self instantiate: WidgetImportList.
-fromModules  := self instantiate: WidgetImportList.
-importClasses  := self instantiate: WidgetImportList.
+imports  := self instantiate: ImportList.
+fromModules  := self instantiate: ImportList.
+importClasses  := self instantiate: ImportList.
 fromModules  label: 'From'.
 importClasses  label: 'Class'.
 self focusOrder add: imports; add: fromModules ; add: importClasses .

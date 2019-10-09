@@ -1,15 +1,15 @@
 Class {
-	#name : #WidgetImportList,
+	#name : #ImportList,
 	#superclass : #ComposablePresenter,
 	#instVars : [
 		'label',
 		'imports'
 	],
-	#category : #'PlayMod-Modules-Imports-Classes'
+	#category : #'PlayMod-Import'
 }
 
 { #category : #specs }
-WidgetImportList class >> defaultSpec [
+ImportList class >> defaultSpec [
 ^ SpecColumnLayout composed
 	add: #label height: self toolbarHeight;
 	add: #imports;
@@ -17,17 +17,17 @@ WidgetImportList class >> defaultSpec [
 ]
 
 { #category : #'as yet unclassified' }
-WidgetImportList >> importContextMenu: aMenuPresenter [ 
+ImportList >> importContextMenu: aMenuPresenter [ 
 	self imports contextMenu: aMenuPresenter.
 ]
 
 { #category : #accessing }
-WidgetImportList >> imports [
+ImportList >> imports [
 	^ imports
 ]
 
 { #category : #initialization }
-WidgetImportList >> initializeWidgets [
+ImportList >> initializeWidgets [
 imports:= self newList.
 imports displayBlock: [ :m | m   ].
 label := self newLabel.
@@ -36,48 +36,48 @@ self focusOrder add: imports.
 ]
 
 { #category : #accessing }
-WidgetImportList >> items [
+ImportList >> items [
 	^ imports items
 ]
 
 { #category : #accessing }
-WidgetImportList >> items: aCollection [
+ImportList >> items: aCollection [
 	imports items: aCollection
 ]
 
 { #category : #accessing }
-WidgetImportList >> label [
+ImportList >> label [
 	^ label
 ]
 
 { #category : #accessing }
-WidgetImportList >> label: aText [
+ImportList >> label: aText [
 label label: aText
 ]
 
 { #category : #accessing }
-WidgetImportList >> resetSelection [
+ImportList >> resetSelection [
 	imports unselectAll
 ]
 
 { #category : #'as yet unclassified' }
-WidgetImportList >> selectedImport [
+ImportList >> selectedImport [
 	^ imports selection selectedItem
 ]
 
 { #category : #initialization }
-WidgetImportList >> title [
+ImportList >> title [
 ^ 'Imports widget'
 ]
 
 { #category : #selection }
-WidgetImportList >> unselectAll [
+ImportList >> unselectAll [
 	
 	imports unselectAll
 ]
 
 { #category : #accessing }
-WidgetImportList >> whenSelectedItemChanged: aBlock [
+ImportList >> whenSelectedItemChanged: aBlock [
 	imports
 		whenSelectionChangedDo: [ :selection | aBlock cull: selection selectedItem ]
 ]

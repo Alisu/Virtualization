@@ -26,7 +26,7 @@ ModuleViewer class >> defaultSpec [
 		newRow: [ :row | row add: #menu ] height: self toolbarHeight;
 		newRow: [ :row | 
 			row
-				add: #modules width: 200;
+				add: #modules width: 250;
 				add: #moduleContentsNotebook ];
 		newRow: [ :row | row add: #definitionsNotebook ];
 		yourself
@@ -91,26 +91,26 @@ ModuleViewer >> buildClassContextMenu [
 ]
 
 { #category : #'as yet unclassified' }
-ModuleViewer >> buildDefinitionNotebook: aPage [.
-	
-	self flag: #BadCode. "Have the string Imports and Classes as variables somewhere pls"
+ModuleViewer >> buildDefinitionNotebook: aPage [
+	self flag: #BadCode.	"Have the string Imports and Classes as variables somewhere pls"
 
 	"remove all definition except module definition page"
-	definitionsNotebook removeLastPages: definitionsNotebook pagesNumber - 1.
-	
+	definitionsNotebook
+		removeLastPages: definitionsNotebook pagesNumber - 1.
+
 	"add the correct pages in definition panel according to the page selected"
-	(aPage title = 'Imports')
-		ifTrue:[  definitionsNotebook 
-			addPage: self importDefinitionTab.
-			].
-	(aPage title = 'Classes')
-		ifTrue:[definitionsNotebook 
-			addPage: self classDefinitionTab;
-			addPage: self methodDefinitionTab.
-			].
-		self needRebuild: false.
-		self buildWithSpec.
-	
+	aPage title = 'Imports'
+		ifTrue: [ definitionsNotebook addPage: self importDefinitionTab ].
+	aPage title = 'Classes'
+		ifTrue: [ definitionsNotebook
+				addPage: self classDefinitionTab;
+				addPage: self methodDefinitionTab ].
+	aPage title = 'Extensions'
+		ifTrue: [ definitionsNotebook
+				addPage: self classDefinitionTab;
+				addPage: self methodDefinitionTab ].
+	self needRebuild: false.
+	self buildWithSpec
 ]
 
 { #category : #initialization }
@@ -279,12 +279,17 @@ ModuleViewer >> definitionsNotebook [
 	^ definitionsNotebook
 ]
 
+{ #category : #'as yet unclassified' }
+ModuleViewer >> extensionIn: aMLModule [ 
+	^aMLModule extensions asArray
+]
+
 { #category : #tabs }
 ModuleViewer >> extensionListTab [
 		
 		^ NotebookPage
 		title: 'Extensions'
-		provider: (extensionList := self instantiate: WidgetClassList)
+		provider: (extensionList := self instantiate: ClassMethodModuleBrowser)
 ]
 
 { #category : #initialize }
@@ -366,6 +371,14 @@ ModuleViewer >> initializePresenter [
 	
 	undeclaredList 
 		classContextMenu: self buildUndeclaredContextMenu.
+	
+	self flag: #CopyPast.	"copy from class now"
+	extensionList
+		classContextMenu: self buildClassContextMenu;
+		methodContextMenu: self buildMethodContextMenu;
+		whenSelectedClassChangedDo: [ :class | class ifNotNil: [ self refreshDefinitionTabs ] ];
+		whenSelectedInstanceMethodChangedDo: [ :method | method ifNotNil: [ self refreshDefinitionTabs ] ];
+		whenSelectedClassMethodChangedDo: [ :method | method ifNotNil: [ self refreshDefinitionTabs ] ].
 ]
 
 { #category : #initialization }
@@ -386,7 +399,6 @@ ModuleViewer >> initializeWidgets [
 	definitionsNotebook := self newNotebook.
 	definitionsNotebook
 		addPage: self moduleDefinitionTab.
-
 	
 	self focusOrder
 		add: modules;
@@ -418,7 +430,7 @@ ModuleViewer >> instanceMethodDefinitionTab [
 { #category : #method }
 ModuleViewer >> methodDefinitionTab [
 	^ NotebookPage
-		title: 'method definition'
+		title: 'Method definition'
 		provider: [ 
 			self newText
 				"aboutToStyle: true;"
@@ -520,6 +532,7 @@ ModuleViewer >> selectModule: aModule [
 		classList classes: (self classesIn: aModule).
 		undeclaredList items: (self undefinedIn: aModule).
 		variableList items: (self variableIn: aModule).
+		extensionList classes: (self extensionIn: aModule).
 		self refreshDefinitionTabs. ]
 ]
 
@@ -578,7 +591,7 @@ ModuleViewer >> undeclaredListTab [
 	
 	^ NotebookPage
 		title: 'Undeclareds'
-		provider: (undeclaredList := self instantiate: WidgetClassList)
+		provider: (undeclaredList := self instantiate: ClassList)
 ]
 
 { #category : #accessing }
@@ -605,7 +618,7 @@ ModuleViewer >> variableList [
 ModuleViewer >> variableListTab [
 	^ NotebookPage
 		title: 'Variables'
-		provider: (variableList := self instantiate: WidgetClassList)
+		provider: (variableList := self instantiate: ClassList)
 ]
 
 { #category : #'as yet unclassified' }
